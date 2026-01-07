@@ -5,7 +5,7 @@ module.exports = {
   description: "Run AI Agent in your browser. https://github.com/browser-use/web-ui",
   icon: "icon.png",
   menu: async (kernel, info) => {
-    let installed = info.exists("app/env")
+    let installed = info.exists("app")
     let running = {
       install: info.running("install.js"),
       start: info.running("start.js"),

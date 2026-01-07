@@ -4,7 +4,7 @@ module.exports = {
     {
       method: "shell.run",
       params: {
-        venv: "env",                // Edit this to customize the venv folder path
+        venv: "F:/browser-use-env",  // Virtual environment on F drive
         env: { },                   // Edit this to customize environment variables (see documentation)
         path: "app",                // Edit this to customize the path to start the shell from
         message: [
@@ -12,12 +12,14 @@ module.exports = {
         ],
         on: [{
           // The regular expression pattern to monitor.
-          // When this pattern occurs in the shell terminal, the shell will return,
+          // Whenever each "event" pattern occurs in the shell terminal, the shell will return,
           // and the script will go onto the next step.
-          "event": "/http:\/\/\\S+/",   
+          // The regular expression match object will be passed on to the next step as `input.event`
+          // Useful for capturing the URL at which the server is running (in case the server prints some message about where the server is running)
+          "event": "/(http:\\/\\/[0-9.:]+)/", 
 
-          // "done": true will move to the next step while keeping the shell alive.
-          // "kill": true will move to the next step after killing the shell.
+          // Use "done": true to move to the next step while keeping the shell alive.
+          // Use "kill": true to move to the next step after killing the shell.
           "done": true
         }]
       }
@@ -28,7 +30,9 @@ module.exports = {
       method: "local.set",
       params: {
         // the input.event is the regular expression match object from the previous step
-        url: "{{input.event[0]}}"
+        // In this example, since the pattern was "/(http:\\/\\/[0-9.:]+)/", input.event[1] will include the exact http url match captured by the parenthesis.
+        // Therefore setting the local variable 'url'
+        url: "{{input.event[1]}}"
       }
     }
   ]
