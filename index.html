@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Speech Avatar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        .avatar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #avatarCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .controls-panel {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1em;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 10px rgba(124,58,237,0.3);
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(124,58,237,0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(220,38,38,0.4);
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            font-size: 0.9em;
+        }
+
+        .status-listening {
+            background: rgba(34,197,94,0.2);
+            border: 1px solid rgba(34,197,94,0.5);
+        }
+
+        .status-speaking {
+            background: rgba(239,68,68,0.2);
+            border: 1px solid rgba(239,68,68,0.5);
+        }
+
+        .status-idle {
+            background: rgba(107,114,128,0.2);
+            border: 1px solid rgba(107,114,128,0.5);
+        }
+
+        .conversation-log {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 0.85em;
+            max-height: 200px;
+        }
+
+        .conversation-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .conversation-log::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+
+        .conversation-log::-webkit-scrollbar-thumb {
+            background: rgba(124,58,237,0.5);
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .log-user {
+            background: rgba(59,130,246,0.2);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .log-avatar {
+            background: rgba(168,85,247,0.2);
+            border-left: 3px solid #a855f7;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-control input[type="range"] {
+            flex: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .listening-indicator {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💜 Real-Time Speech Avatar</h1>
+        </div>
+        <div class="main-content">
+            <div class="avatar-container">
+                <canvas id="avatarCanvas" width="800" height="1000"></canvas>
+            </div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>Your Name</label>
+                    <input type="text" id="userName" placeholder="Enter your name" value="">
+                </div>
+                <div class="control-group">
+                    <label>TTS Service</label>
+                    <select id="ttsService">
+                        <option value="google">Google TTS (Free)</option>
+                        <option value="coqui">Coqui TTS (Free)</option>
+                        <option value="piper">Piper TTS (Local)</option>
+                        <option value="elevenlabs">ElevenLabs (Free Tier)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Voice Speed</label>
+                    <input type="range" id="voiceSpeed" min="0.5" max="1.5" step="0.1" value="1.0">
+                    <span id="speedValue">1.0x</span>
+                </div>
+                <div class="control-group">
+                    <label>Volume</label>
+                    <div class="volume-control">
+                        <input type="range" id="volume" min="0" max="100" value="80">
+                        <span id="volumeValue">80%</span>
+                    </div>
+                </div>
+                <button id="toggleBtn" class="btn-primary">Start Conversation</button>
+                <button id="clearBtn" class="btn-danger">Clear Memory</button>
+                <div id="status" class="status status-idle">Status: Idle</div>
+                <div class="control-group">
+                    <label>Conversation Log</label>
+                    <div class="conversation-log" id="conversationLog"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let isListening = false;
+        let recognition = null;
+        let conversationHistory = [];
+        let userName = '';
+        let userContext = {
+            name: '',
+            preferences: [],
+            topics: [],
+            mood: 'playful'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSpeechRecognition();
+            initializeAvatar();
+            loadMemory();
+            setupEventListeners();
+        });
+
+        // Speech Recognition Setup
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    updateStatus('Listening...', 'listening');
+                    animateAvatar('listening');
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[event.results.length - 1][0].transcript;
+                    processUserInput(transcript);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    updateStatus('Error: ' + event.error, 'idle');
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    if (document.getElementById('toggleBtn').textContent === 'Stop Conversation') {
+                        recognition.start();
+                    } else {
+                        updateStatus('Idle', 'idle');
+                        animateAvatar('idle');
+                    }
+                };
+            } else {
+                alert('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+            }
+        }
+
+        // Avatar Rendering
+        function initializeAvatar() {
+            const canvas = document.getElementById('avatarCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size based on container
+            const container = canvas.parentElement;
+            const maxWidth = container.clientWidth - 40;
+            const maxHeight = container.clientHeight - 40;
+            const aspectRatio = 800 / 1000;
+            
+            let width = maxWidth;
+            let height = width / aspectRatio;
+            if (height > maxHeight) {
+                height = maxHeight;
+                width = height * aspectRatio;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            drawAvatar(ctx, canvas.width, canvas.height, 'idle');
+            
+            // Redraw on resize
+            window.addEventListener('resize', () => {
+                const container = canvas.parentElement;
+                const maxWidth = container.clientWidth - 40;
+                const maxHeight = container.clientHeight - 40;
+                const aspectRatio = 800 / 1000;
+                
+                let width = maxWidth;
+                let height = width / aspectRatio;
+                if (height > maxHeight) {
+                    height = maxHeight;
+                    width = height * aspectRatio;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                drawAvatar(ctx, canvas.width, canvas.height, 'idle');
+            });
+        }
+
+        function drawAvatar(ctx, width, height, state) {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+            bgGradient.addColorStop(0, '#1a0a1a');
+            bgGradient.addColorStop(1, '#2d1b2d');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            const centerX = width / 2;
+            const headY = height * 0.25;
+            const headRadius = Math.min(width, height) * 0.15;
+            
+            // Head (dark skin tone)
+            ctx.beginPath();
+            ctx.arc(centerX, headY, headRadius, 0, Math.PI * 2);
+            const skinGradient = ctx.createRadialGradient(centerX, headY - headRadius * 0.3, 0, centerX, headY, headRadius);
+            skinGradient.addColorStop(0, '#8B4513');
+            skinGradient.addColorStop(0.5, '#654321');
+            skinGradient.addColorStop(1, '#3D2817');
+            ctx.fillStyle = skinGradient;
+            ctx.fill();
+            
+            // Neck
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(centerX - headRadius * 0.3, headY + headRadius, headRadius * 0.6, headRadius * 0.8);
+            
+            // Body (leather jacket effect)
+            ctx.beginPath();
+            ctx.moveTo(centerX - headRadius * 0.8, headY + headRadius * 1.5);
+            ctx.lineTo(centerX - headRadius * 1.2, height * 0.7);
+            ctx.lineTo(centerX + headRadius * 1.2, height * 0.7);
+            ctx.lineTo(centerX + headRadius * 0.8, headY + headRadius * 1.5);
+            ctx.closePath();
+            const leatherGradient = ctx.createLinearGradient(centerX - headRadius * 1.2, 0, centerX + headRadius * 1.2, 0);
+            leatherGradient.addColorStop(0, '#1a1a1a');
+            leatherGradient.addColorStop(0.5, '#2d2d2d');
+            leatherGradient.addColorStop(1, '#1a1a1a');
+            ctx.fillStyle = leatherGradient;
+            ctx.fill();
+            
+            // Eyes (bold, confident)
+            const eyeY = headY - headRadius * 0.2;
+            const eyeSpacing = headRadius * 0.4;
+            
+            // Eye sockets (smoky makeup)
+            ctx.beginPath();
+            ctx.ellipse(centerX - eyeSpacing, eyeY, headRadius * 0.15, headRadius * 0.2, 0, 0, Math.PI * 2);
+            ctx.ellipse(centerX + eyeSpacing, eyeY, headRadius * 0.15, headRadius * 0.2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fill();
+            
+            // Eyes
+            ctx.beginPath();
+            ctx.arc(centerX - eyeSpacing, eyeY, headRadius * 0.08, 0, Math.PI * 2);
+            ctx.arc(centerX + eyeSpacing, eyeY, headRadius * 0.08, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            
+            // Pupils (confident stare)
+            const pupilOffset = state === 'listening' ? headRadius * 0.02 : 0;
+            ctx.beginPath();
+            ctx.arc(centerX - eyeSpacing + pupilOffset, eyeY, headRadius * 0.04, 0, Math.PI * 2);
+            ctx.arc(centerX + eyeSpacing + pupilOffset, eyeY, headRadius * 0.04, 0, Math.PI * 2);
+            ctx.fillStyle = '#000000';
+            ctx.fill();
+            
+            // Eyeliner (bold)
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX - eyeSpacing - headRadius * 0.12, eyeY);
+            ctx.lineTo(centerX - eyeSpacing - headRadius * 0.18, eyeY - headRadius * 0.05);
+            ctx.moveTo(centerX - eyeSpacing + headRadius * 0.12, eyeY);
+            ctx.lineTo(centerX - eyeSpacing + headRadius * 0.18, eyeY - headRadius * 0.05);
+            ctx.moveTo(centerX + eyeSpacing - headRadius * 0.12, eyeY);
+            ctx.lineTo(centerX + eyeSpacing - headRadius * 0.18, eyeY - headRadius * 0.05);
+            ctx.moveTo(centerX + eyeSpacing + headRadius * 0.12, eyeY);
+            ctx.lineTo(centerX + eyeSpacing + headRadius * 0.18, eyeY - headRadius * 0.05);
+            ctx.stroke();
+            
+            // Lips (bold, dark)
+            ctx.beginPath();
+            ctx.ellipse(centerX, headY + headRadius * 0.3, headRadius * 0.2, headRadius * 0.1, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#8B0000';
+            ctx.fill();
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Hair (styled, bold)
+            ctx.beginPath();
+            ctx.arc(centerX, headY - headRadius * 0.3, headRadius * 1.1, Math.PI, 0, false);
+            ctx.lineTo(centerX + headRadius * 1.1, headY - headRadius * 0.5);
+            ctx.lineTo(centerX, headY - headRadius * 0.8);
+            ctx.lineTo(centerX - headRadius * 1.1, headY - headRadius * 0.5);
+            ctx.closePath();
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fill();
+            
+            // Mouth animation for speaking
+            if (state === 'speaking') {
+                const mouthOpen = Math.sin(Date.now() / 100) * 0.1;
+                ctx.beginPath();
+                ctx.ellipse(centerX, headY + headRadius * 0.3 + mouthOpen, headRadius * 0.15, headRadius * 0.08 + Math.abs(mouthOpen) * 2, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#000000';
+                ctx.fill();
+            }
+        }
+
+        function animateAvatar(state) {
+            const canvas = document.getElementById('avatarCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (state === 'speaking') {
+                const animate = () => {
+                    drawAvatar(ctx, canvas.width, canvas.height, 'speaking');
+                    if (state === 'speaking') {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                animate();
+            } else {
+                drawAvatar(ctx, canvas.width, canvas.height, state);
+            }
+        }
+
+        // Personality & Memory System
+        function processUserInput(text) {
+            addToLog('You', text);
+            
+            // Extract name if mentioned
+            const nameMatch = text.match(/(?:my name is|i'm|i am|call me)\s+([A-Z][a-z]+)/i);
+            if (nameMatch) {
+                userName = nameMatch[1];
+                userContext.name = userName;
+                document.getElementById('userName').value = userName;
+                saveMemory();
+            } else if (userName) {
+                userContext.name = userName;
+            }
+            
+            // Generate response with personality
+            const response = generateResponse(text);
+            speakResponse(response);
+        }
+
+        function generateResponse(userInput) {
+            const lowerInput = userInput.toLowerCase();
+            const responses = [];
+            
+            // Personality traits: flirty, sharp, teasing, remembers context
+            if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey')) {
+                if (userContext.name) {
+                    responses.push(`Well, well, ${userContext.name}... finally decided to show up, hmm?`);
+                    responses.push(`Hey there, ${userContext.name}. Miss me?`);
+                } else {
+                    responses.push(`Well hello there, stranger. Care to tell me your name?`);
+                    responses.push(`Hey there, handsome. Who do I have the pleasure of talking to?`);
+                }
+            } else if (lowerInput.includes('how are you')) {
+                responses.push(`I'm doing great, especially now that you're here.`);
+                responses.push(`Better now that you're talking to me.`);
+            } else if (lowerInput.includes('good boy') || lowerInput.includes('cute') || lowerInput.includes('adorable')) {
+                responses.push(`Oh, you think you're being cute? I like that.`);
+            } else if (lowerInput.includes('thank you') || lowerInput.includes('thanks')) {
+                responses.push(`You're welcome, ${userContext.name || 'sweetie'}.`);
+                responses.push(`Anytime, ${userContext.name || 'darling'}.`);
+            } else if (lowerInput.includes('love') || lowerInput.includes('like you')) {
+                responses.push(`Aww, that's sweet. But I'm not that easy to impress, you know.`);
+                responses.push(`Flattery will get you everywhere, ${userContext.name || 'honey'}.`);
+            } else if (lowerInput.includes('bye') || lowerInput.includes('goodbye')) {
+                responses.push(`Leaving so soon? Fine, ${userContext.name || 'sweetie'}. Don't be a stranger.`);
+            } else {
+                // Contextual responses
+                if (userContext.name) {
+                    responses.push(`Hmm, interesting, ${userContext.name}. Tell me more.`);
+                    responses.push(`I see, ${userContext.name}. You're full of surprises.`);
+                    responses.push(`*soft laugh* You're something else, ${userContext.name}.`);
+                } else {
+                    responses.push(`*playful sigh* You're going to have to be more specific, darling.`);
+                    responses.push(`Hmm, I'm listening. Go on.`);
+                    responses.push(`Interesting. Tell me more about that.`);
+                }
+            }
+            
+            // Add occasional "good boy" for positive interactions
+            if (Math.random() < 0.1 && (lowerInput.includes('yes') || lowerInput.includes('please') || lowerInput.includes('sure'))) {
+                return `Good boy. ${responses[Math.floor(Math.random() * responses.length)]}`;
+            }
+            
+            // Add soft laughs and sighs
+            if (Math.random() < 0.15) {
+                const sounds = ['*soft laugh*', '*playful sigh*', '*chuckles*'];
+                return `${sounds[Math.floor(Math.random() * sounds.length)]} ${responses[Math.floor(Math.random() * responses.length)]}`;
+            }
+            
+            return responses[Math.floor(Math.random() * responses.length)] || `I'm here, ${userContext.name || 'darling'}. What's on your mind?`;
+        }
+
+        // Text-to-Speech
+        async function speakResponse(text) {
+            addToLog('Avatar', text);
+            updateStatus('Speaking...', 'speaking');
+            animateAvatar('speaking');
+            
+            const ttsService = document.getElementById('ttsService').value;
+            const speed = parseFloat(document.getElementById('voiceSpeed').value);
+            const volume = parseFloat(document.getElementById('volume').value) / 100;
+            
+            try {
+                if (ttsService === 'google') {
+                    await speakWithGoogleTTS(text, speed, volume);
+                } else if (ttsService === 'coqui') {
+                    await speakWithCoquiTTS(text, speed, volume);
+                } else if (ttsService === 'piper') {
+                    await speakWithPiperTTS(text, speed, volume);
+                } else if (ttsService === 'elevenlabs') {
+                    await speakWithElevenLabsTTS(text, speed, volume);
+                }
+            } catch (error) {
+                console.error('TTS Error:', error);
+                // Fallback to Web Speech API
+                speakWithWebSpeech(text, speed, volume);
+            }
+            
+            updateStatus('Listening...', 'listening');
+            animateAvatar('listening');
+        }
+
+        function speakWithWebSpeech(text, speed, volume) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = speed;
+            utterance.volume = volume;
+            utterance.pitch = 1.1; // Slightly higher pitch for feminine voice
+            
+            // Try to find a female voice
+            const voices = speechSynthesis.getVoices();
+            const femaleVoice = voices.find(v => v.name.toLowerCase().includes('female') || 
+                                                v.name.toLowerCase().includes('zira') ||
+                                                v.name.toLowerCase().includes('samantha') ||
+                                                v.name.toLowerCase().includes('karen'));
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+            
+            utterance.onend = () => {
+                updateStatus('Listening...', 'listening');
+                animateAvatar('listening');
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+
+        async function speakWithGoogleTTS(text, speed, volume) {
+            // Google TTS API (free tier)
+            const apiKey = ''; // User can add their own
+            if (!apiKey) {
+                // Fallback to Web Speech API
+                speakWithWebSpeech(text, speed, volume);
+                return;
+            }
+            
+            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    input: { text: text },
+                    voice: { languageCode: 'en-US', ssmlGender: 'FEMALE', name: 'en-US-Wavenet-F' },
+                    audioConfig: { audioEncoding: 'MP3', speakingRate: speed, volumeGainDb: (volume - 1) * 6 }
+                })
+            });
+            
+            const data = await response.json();
+            if (data.audioContent) {
+                playAudio(data.audioContent, volume);
+            } else {
+                speakWithWebSpeech(text, speed, volume);
+            }
+        }
+
+        async function speakWithCoquiTTS(text, speed, volume) {
+            // Coqui TTS - using their free API endpoint or local server
+            // Note: Coqui TTS free API may require registration
+            // For local setup, run: pip install TTS && tts-server
+            try {
+                // Try local Coqui server first (if running on localhost:5002)
+                let response = await fetch('http://localhost:5002/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        speaker_wav: '', // Use default voice
+                        language: 'en'
+                    })
+                }).catch(() => null);
+                
+                // If local server not available, try cloud API (requires API key)
+                if (!response || !response.ok) {
+                    const apiKey = localStorage.getItem('coqui_api_key') || '';
+                    if (apiKey) {
+                        response = await fetch('https://app.coqui.ai/api/v1/samples', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${apiKey}`
+                            },
+                            body: JSON.stringify({
+                                text: text,
+                                voice_id: 'Claribel Dervla'
+                            })
+                        });
+                    } else {
+                        throw new Error('Coqui API key not set. Using fallback.');
+                    }
+                }
+                
+                if (response && response.ok) {
+                    const audioBlob = await response.blob();
+                    playAudioBlob(audioBlob, volume);
+                } else {
+                    throw new Error('Coqui API error');
+                }
+            } catch (error) {
+                console.error('Coqui TTS error:', error);
+                console.log('Falling back to Web Speech API');
+                speakWithWebSpeech(text, speed, volume);
+            }
+        }
+
+        async function speakWithPiperTTS(text, speed, volume) {
+            // Piper TTS - requires local server
+            // To set up: Download piper from https://github.com/rhasspy/piper
+            // Run: piper --model en_US-lessac-medium --output_file /dev/stdout | base64
+            // Or use a local HTTP server wrapper
+            try {
+                // Try local Piper server (if running on localhost:5000)
+                const response = await fetch('http://localhost:5000/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        model: 'en_US-lessac-medium',
+                        speed: speed
+                    })
+                });
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    playAudioBlob(audioBlob, volume);
+                } else {
+                    throw new Error('Piper server not available');
+                }
+            } catch (error) {
+                console.log('Piper TTS requires local server setup. Using fallback.');
+                console.log('To use Piper: Download from https://github.com/rhasspy/piper and run a local server');
+                speakWithWebSpeech(text, speed, volume);
+            }
+        }
+
+        async function speakWithElevenLabsTTS(text, speed, volume) {
+            // ElevenLabs free tier
+            const apiKey = ''; // User can add their own
+            if (!apiKey) {
+                speakWithWebSpeech(text, speed, volume);
+                return;
+            }
+            
+            try {
+                const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'xi-api-key': apiKey
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        model_id: 'eleven_monolingual_v1',
+                        voice_settings: {
+                            stability: 0.5,
+                            similarity_boost: 0.75,
+                            speed: speed
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    playAudioBlob(audioBlob, volume);
+                } else {
+                    throw new Error('ElevenLabs API error');
+                }
+            } catch (error) {
+                console.error('ElevenLabs TTS error:', error);
+                speakWithWebSpeech(text, speed, volume);
+            }
+        }
+
+        function playAudio(base64Audio, volume) {
+            const audio = new Audio('data:audio/mp3;base64,' + base64Audio);
+            audio.volume = volume;
+            audio.play();
+        }
+
+        function playAudioBlob(blob, volume) {
+            const audioUrl = URL.createObjectURL(blob);
+            const audio = new Audio(audioUrl);
+            audio.volume = volume;
+            audio.onended = () => {
+                URL.revokeObjectURL(audioUrl);
+                updateStatus('Listening...', 'listening');
+                animateAvatar('listening');
+            };
+            audio.play();
+        }
+
+        // UI Helpers
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = `Status: ${message}`;
+            statusEl.className = `status status-${type}`;
+        }
+
+        function addToLog(speaker, message) {
+            const log = document.getElementById('conversationLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${speaker.toLowerCase()}`;
+            entry.innerHTML = `<strong>${speaker}:</strong> ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('toggleBtn').addEventListener('click', () => {
+                const btn = document.getElementById('toggleBtn');
+                if (btn.textContent === 'Start Conversation') {
+                    userName = document.getElementById('userName').value || '';
+                    if (userName) {
+                        userContext.name = userName;
+                        saveMemory();
+                    }
+                    recognition.start();
+                    btn.textContent = 'Stop Conversation';
+                    btn.className = 'btn-danger';
+                } else {
+                    recognition.stop();
+                    btn.textContent = 'Start Conversation';
+                    btn.className = 'btn-primary';
+                    speechSynthesis.cancel();
+                }
+            });
+            
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                if (confirm('Clear all conversation memory?')) {
+                    conversationHistory = [];
+                    userContext = { name: '', preferences: [], topics: [], mood: 'playful' };
+                    userName = '';
+                    document.getElementById('userName').value = '';
+                    document.getElementById('conversationLog').innerHTML = '';
+                    localStorage.removeItem('avatarMemory');
+                    updateStatus('Memory cleared', 'idle');
+                }
+            });
+            
+            document.getElementById('voiceSpeed').addEventListener('input', (e) => {
+                document.getElementById('speedValue').textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+            });
+            
+            document.getElementById('volume').addEventListener('input', (e) => {
+                document.getElementById('volumeValue').textContent = e.target.value + '%';
+            });
+            
+            document.getElementById('userName').addEventListener('change', (e) => {
+                userName = e.target.value;
+                userContext.name = userName;
+                saveMemory();
+            });
+        }
+
+        // Memory Management
+        function saveMemory() {
+            const memory = {
+                userName: userContext.name,
+                context: userContext,
+                history: conversationHistory.slice(-50) // Keep last 50 entries
+            };
+            localStorage.setItem('avatarMemory', JSON.stringify(memory));
+        }
+
+        function loadMemory() {
+            const saved = localStorage.getItem('avatarMemory');
+            if (saved) {
+                try {
+                    const memory = JSON.parse(saved);
+                    userContext = memory.context || userContext;
+                    userName = memory.userName || '';
+                    conversationHistory = memory.history || [];
+                    if (userName) {
+                        document.getElementById('userName').value = userName;
+                    }
+                } catch (e) {
+                    console.error('Error loading memory:', e);
+                }
+            }
+        }
+
+        // Load voices when available
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                // Voices loaded
+            };
+        }
+    </script>
+</body>
+</html>

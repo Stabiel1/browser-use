@@ -4,11 +4,14 @@ module.exports = {
     {
       method: "shell.run",
       params: {
-        venv: "F:/browser-use-env",  // Virtual environment on F drive
-        env: { },                   // Edit this to customize environment variables (see documentation)
+        venv: "{{envs.BROWSER_USE_VENV_PATH || (platform === 'win32' ? 'F:/browser-use-env' : 'env')}}",  // Use BROWSER_USE_VENV_PATH env var if set, F drive on Windows, else relative path 'env'
+        env: {
+          // Use F: drive for Playwright browsers on Windows to save space
+          PLAYWRIGHT_BROWSERS_PATH: "{{platform === 'win32' ? (envs.PLAYWRIGHT_BROWSERS_PATH || 'F:/playwright-browsers') : envs.PLAYWRIGHT_BROWSERS_PATH || ''}}"
+        },
         path: "app",                // Edit this to customize the path to start the shell from
         message: [
-          "python webui.py"
+          "python webui.py --ip 127.0.0.1 --port {{port}}"
         ],
         on: [{
           // The regular expression pattern to monitor.
@@ -16,7 +19,7 @@ module.exports = {
           // and the script will go onto the next step.
           // The regular expression match object will be passed on to the next step as `input.event`
           // Useful for capturing the URL at which the server is running (in case the server prints some message about where the server is running)
-          "event": "/(http:\\/\\/[0-9.:]+)/", 
+          "event": "/(http:\\/\\/\\S+)/", 
 
           // Use "done": true to move to the next step while keeping the shell alive.
           // Use "kill": true to move to the next step after killing the shell.
@@ -30,7 +33,7 @@ module.exports = {
       method: "local.set",
       params: {
         // the input.event is the regular expression match object from the previous step
-        // In this example, since the pattern was "/(http:\\/\\/[0-9.:]+)/", input.event[1] will include the exact http url match captured by the parenthesis.
+        // In this example, since the pattern was "/(http:\\/\\/\\S+)/", input.event[1] will include the exact http url match captured by the parenthesis (supports both IP addresses and hostnames).
         // Therefore setting the local variable 'url'
         url: "{{input.event[1]}}"
       }
