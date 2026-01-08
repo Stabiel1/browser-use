@@ -2,5 +2,8 @@
   "version": "3.6",
   "title": "Real-Time Speech Avatar",
   "description": "A real-time speech-to-speech girlfriend avatar with personality, memory, and stunning visual design. Features dark skin, bold makeup, leather aesthetic, flirty personality, and remembers everything you say.",
-  "icon": "icon.png"
+  "icon": "icon.png",
+  "plugin": {
+    "menu": []
+  }
 }
