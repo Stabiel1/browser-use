@@ -11,7 +11,8 @@ module.exports = {
       start: info.running("start.js"),
       update: info.running("update.js"),
       reset: info.running("reset.js"),
-      restart: info.running("restart.js")
+      restart: info.running("restart.js"),
+      open_socials: info.running("open_socials.js")
     }
     if (running.install) {
       return [{
@@ -44,6 +45,10 @@ module.exports = {
             icon: 'fa-solid fa-terminal',
             text: "Terminal",
             href: "start.js",
+          }, {
+            icon: 'fa-solid fa-rotate',
+            text: "Restart",
+            href: "restart.js",
           }]
         }
       } else if (running.update) {
@@ -67,12 +72,23 @@ module.exports = {
           text: "Restarting",
           href: "restart.js",
         }]
+      } else if (running.open_socials) {
+        return [{
+          default: true,
+          icon: 'fa-solid fa-globe',
+          text: "Opening Socials",
+          href: "open_socials.js",
+        }]
       } else {
         return [{
           default: true,
           icon: "fa-solid fa-power-off",
           text: "Start",
           href: "start.js",
+        }, {
+          icon: "fa-solid fa-globe",
+          text: "Open Socials",
+          href: "open_socials.js",
         }, {
           icon: "fa-solid fa-rotate",
           text: "Restart",

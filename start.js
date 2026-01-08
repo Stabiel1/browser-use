@@ -2,6 +2,16 @@ module.exports = {
   daemon: true,
   run: [
     {
+      // Deactivate conda three times to ensure clean environment
+      method: "shell.run",
+      params: {
+        path: "app",
+        message: [
+          "{{platform === 'win32' ? 'conda deactivate 2>nul & conda deactivate 2>nul & conda deactivate 2>nul' : 'conda deactivate 2>/dev/null; conda deactivate 2>/dev/null; conda deactivate 2>/dev/null'}}"
+        ]
+      }
+    },
+    {
       method: "shell.run",
       params: {
         venv: "{{envs.BROWSER_USE_VENV_PATH || (platform === 'win32' ? 'F:/browser-use-env' : 'env')}}",  // Use BROWSER_USE_VENV_PATH env var if set, F drive on Windows, else relative path 'env'

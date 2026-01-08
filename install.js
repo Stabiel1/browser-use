@@ -41,6 +41,16 @@ module.exports = {
       }
     },
     {
+      // Deactivate conda three times to ensure clean environment
+      method: "shell.run",
+      params: {
+        path: "app",
+        message: [
+          "{{platform === 'win32' ? 'conda deactivate 2>nul & conda deactivate 2>nul & conda deactivate 2>nul' : 'conda deactivate 2>/dev/null; conda deactivate 2>/dev/null; conda deactivate 2>/dev/null'}}"
+        ]
+      }
+    },
+    {
       // Install Python dependencies in virtual environment on F: drive
       method: "shell.run",
       params: {
@@ -49,6 +59,16 @@ module.exports = {
         path: "app",
         message: [
           "uv pip install -r requirements.txt"
+        ]
+      }
+    },
+    {
+      // Deactivate conda three times before Playwright install
+      method: "shell.run",
+      params: {
+        path: "app",
+        message: [
+          "{{platform === 'win32' ? 'conda deactivate 2>nul & conda deactivate 2>nul & conda deactivate 2>nul' : 'conda deactivate 2>/dev/null; conda deactivate 2>/dev/null; conda deactivate 2>/dev/null'}}"
         ]
       }
     },
