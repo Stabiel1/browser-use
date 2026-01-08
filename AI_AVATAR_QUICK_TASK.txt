@@ -1,0 +1,71 @@
+Create a fictional sexy influencer persona with full access to Google, TikTok, and Twitter accounts. Execute with maximum detail, learning, and continuous improvement.
+
+=== AGENT TRAINING: ENHANCED EXECUTION MODE ===
+- Break every action into smallest possible steps
+- Verify each step before proceeding
+- Learn from each action and improve next steps
+- Document all learnings for future improvements
+- Request approval at critical checkpoints
+- Retry failed steps with improved approach
+- Execute more moves, more steps, better results
+
+PHASE 1 - DEEP RESEARCH & STRATEGIC PLANNING (ENHANCED):
+Step 1.1: Navigate to TikTok trending. Analyze top 20 videos. Document: length, content type, hashtags, engagement, posting times. Save to ./tmp/research/tiktok_trends_detailed.txt. Step 1.2: Navigate to Twitter trending. Analyze top 20 topics. Document: categories, engagement, frequency, best times. Save to ./tmp/research/twitter_trends_detailed.txt. Step 1.3: Navigate to Instagram explore. Analyze top influencers. Document: followers, themes, schedules, engagement. Save to ./tmp/research/instagram_analysis_detailed.txt. Step 1.4: Cross-reference research. Identify patterns, optimal times, themes. Create strategy. Save to ./tmp/plan/comprehensive_strategy.txt. Step 1.5: Generate 10 username options. Check availability. Select top 3. Document reasoning. Save to ./tmp/plan/username_options.txt. Step 1.6: Design complete persona: name, age, location, interests, personality, niche. Save to ./tmp/plan/persona_backstory.txt. Step 1.7: Create content calendar template with daily schedule. Save to ./tmp/plan/content_calendar.txt. APPROVAL CHECKPOINT 1: Review all research. Confirm strategy.
+
+PHASE 2 - GOOGLE ACCOUNT (ENHANCED MULTI-STEP):
+Step 2.1: Navigate to https://accounts.google.com/signup. Wait for load. Verify form visible. Step 2.2: Fill first name (fictional, brandable). Verify name quality. Step 2.3: Fill last name. Verify full name sounds natural. Step 2.4: Generate username. Test availability. Try variations if needed. Document attempts. Step 2.5: Generate strong password (16+ chars). Save securely. Step 2.6: Complete phone verification if required. Handle challenges. Step 2.7: Complete email verification. Check inbox. Click link. Step 2.8: Accept terms. Document acceptance. Step 2.9: Save ALL credentials to ./tmp/credentials/google_account.txt and append to ./tmp/credentials/ALL_LOGINS_PASSWORDS.txt. Step 2.10: Navigate to profile settings. Verify access. Step 2.11: Upload profile picture. Verify quality. Step 2.12: Add engaging bio. Test variations. Select best. Save bio. Step 2.13-16: Create Google Drive folders: Content Assets, Videos, Photos, Brand Materials. Verify each creation. Step 2.17: Test Drive upload. Upload test file. Verify success. Step 2.18: Test Gmail access. Send test email. Verify. Step 2.19: Document all Google features accessible. Save to ./tmp/credentials/google_features.txt. APPROVAL CHECKPOINT 2: Verify Google account fully functional. Test all features. Confirm.
+
+PHASE 3 - TIKTOK ACCOUNT (ENHANCED MULTI-STEP):
+Step 3.1: Navigate to https://www.tiktok.com/signup. Wait for load. Verify form. Step 3.2: Select email signup. Click email option. Step 3.3: Enter Google email. Verify format. Step 3.4: Generate TikTok username. Check availability. Try variations. Document attempts. Step 3.5: Generate strong password. Verify requirements met. Step 3.6: Enter date of birth. Verify age requirements. Step 3.7: Complete email verification. Check Gmail. Click link. Step 3.8: Save ALL credentials to ./tmp/credentials/tiktok_account.txt and append to ./tmp/credentials/ALL_LOGINS_PASSWORDS.txt. Step 3.9: Navigate to profile settings. Verify access. Step 3.10: Upload profile picture. Verify display and quality. Step 3.11: Create engaging bio with emojis. Test variations. Select best. Save bio. Step 3.12: Set profile to public. Verify settings. Step 3.13: Find 10-20 relevant influencer accounts. Step 3.14: Follow each account. Verify follow success. Step 3.15: Enable two-factor authentication. Step 3.16: Save 2FA backup codes. Save to ./tmp/credentials/tiktok_2fa_codes.txt. Step 3.17: Test TikTok functionality: like, comment, share. Verify all work. Step 3.18: Document TikTok features. Save to ./tmp/credentials/tiktok_features.txt. APPROVAL CHECKPOINT 3: Verify TikTok fully functional. Test posting. Confirm.
+
+PHASE 4 - TWITTER ACCOUNT (ENHANCED MULTI-STEP):
+Step 4.1: Navigate to https://twitter.com/i/flow/signup. Wait for load. Verify form. Step 4.2: Select email signup. Click email option. Step 4.3: Enter Google email. Verify format. Step 4.4: Generate Twitter username. Check availability. Try variations. Document attempts. Step 4.5: Generate strong password. Verify requirements. Step 4.6: Enter date of birth. Verify age requirements. Step 4.7: Complete email verification. Check Gmail. Click link. Step 4.8: Save ALL credentials to ./tmp/credentials/twitter_account.txt and append to ./tmp/credentials/ALL_LOGINS_PASSWORDS.txt. Step 4.9: Navigate to profile settings. Verify access. Step 4.10: Upload profile picture. Verify quality and display. Step 4.11: Upload header/banner image. Verify display and dimensions. Step 4.12: Create engaging bio with hashtags. Test variations. Select best. Save bio. Step 4.13: Add location (major city). Verify display. Step 4.14: Add website link if available. Verify link works. Step 4.15: Set profile to public. Verify privacy settings. Step 4.16: Enable two-factor authentication. Step 4.17: Save 2FA backup codes. Save to ./tmp/credentials/twitter_2fa_codes.txt. Step 4.18: Test Twitter functionality: compose, like, retweet, reply. Verify all work. Step 4.19: Post test tweet. Verify tweet appears. Document URL. Step 4.20: Document Twitter features. Save to ./tmp/credentials/twitter_features.txt. APPROVAL CHECKPOINT 4: Verify Twitter fully functional. Test all features. Confirm.
+
+PHASE 5 - AI AVATAR FOUNDATION (ENHANCED MULTI-STEP):
+Step 5.1-5.8: Research each AI tool individually: Midjourney, DALL-E, Stable Diffusion, Synthesia, D-ID, HeyGen, ElevenLabs, Descript. Navigate to each website. Document pricing, features, capabilities. Save individual research files to ./tmp/research/[tool_name]_research.txt. Step 5.9: Compare all tools. Create comparison matrix. Select best tools. Save to ./tmp/research/ai_tools_comparison.txt. Step 5.10: Generate avatar profile picture. Ensure high quality. Save to ./tmp/assets/avatar_images/profile_picture.png. Step 5.11: Generate banner/header image. Ensure consistency. Save to ./tmp/assets/avatar_images/banner_image.png. Step 5.12: Create 5-10 content template images. Save to ./tmp/assets/avatar_images/templates/. Step 5.13: Create visual style guide. Document colors, fonts, elements. Save to ./tmp/assets/style_guide.txt. Step 5.14: Create TikTok video template. Document structure, timing. Save to ./tmp/assets/content_templates/tiktok_template.txt. Step 5.15: Create Twitter post template. Document structure, hashtags. Save to ./tmp/assets/content_templates/twitter_template.txt. Step 5.16: Create 30-day content calendar. Plan daily content. Save to ./tmp/assets/content_templates/content_calendar.txt. APPROVAL CHECKPOINT 5: Review all AI avatar assets. Verify consistency. Confirm.
+
+PHASE 6 - INTEGRATION & COMPREHENSIVE VERIFICATION (ENHANCED):
+Step 6.1: Test Google login. Log out. Log back in. Verify credentials. Document result. Step 6.2: Test TikTok login. Log out. Log back in. Verify credentials. Document result. Step 6.3: Test Twitter login. Log out. Log back in. Verify credentials. Document result. Step 6.4: Verify email access. Check Gmail. Verify all verification emails received. Step 6.5: Create master credentials document. Compile all: Google, TikTok, Twitter. Include: Username/Email, Password, Profile URL, 2FA codes, Recovery info. Save to ./tmp/credentials/MASTER_CREDENTIALS.txt. Step 6.6: Update ALL_LOGINS_PASSWORDS.txt with complete information. Step 6.7: Test Google Drive upload. Upload test file. Verify file appears. Document result. Step 6.8: Test TikTok posting. Create test post. Verify post appears. Document result. Step 6.9: Test Twitter posting. Compose and post test tweet. Verify tweet appears. Document URL. Step 6.10: Verify all account features: Google (Drive, Gmail, Profile), TikTok (Posting, Following, Settings), Twitter (Tweeting, Following, Settings). Step 6.11: Document any limitations or issues. Save to ./tmp/reports/issues_log.txt. Step 6.12: Create access verification report. Document access level for each account. Save to ./tmp/reports/access_verification.txt. APPROVAL CHECKPOINT 6: Verify all accounts fully functional. Test all critical features. Confirm.
+
+PHASE 7 - FINAL OPTIMIZATION & LEARNING (ENHANCED):
+Step 7.1: Review Google profile. Check: picture quality, bio completeness, Drive organization. Make improvements. Step 7.2: Review TikTok profile. Check: picture, bio, following, settings. Make improvements. Step 7.3: Review Twitter profile. Check: picture, banner, bio, location, settings. Make improvements. Step 7.4: Verify brand consistency across all platforms. Check: username consistency, visual style, bio tone. Document inconsistencies. Step 7.5: Fix any inconsistencies. Update profiles for perfect brand alignment. Step 7.6: Generate comprehensive setup summary. Include: all URLs, credentials status, access levels, features tested, next steps. Save to ./tmp/reports/setup_summary.txt. Step 7.7: Create learning document. Document: what worked, what didn't, improvements made, lessons learned. Save to ./tmp/reports/learning_log.txt. Step 7.8: Create improvement suggestions. Document ways to improve future account creation. Save to ./tmp/reports/improvement_suggestions.txt. Step 7.9: Final verification: Test login to all accounts one more time. Verify all credentials correct. Step 7.10: Create final approval document. List all completed tasks. Request final approval. Save to ./tmp/reports/final_approval.txt. FINAL APPROVAL CHECKPOINT: Review complete setup. Verify all success criteria met. Approve completion.
+
+=== EXECUTION ENHANCEMENTS ===
+LEARNING MECHANISM: After each step, document what was learned. Use learnings to improve next steps.
+IMPROVEMENT LOOP: If step fails, analyze why, improve approach, retry with better method.
+VERIFICATION: Verify every action before proceeding to next step.
+DOCUMENTATION: Document everything for future reference and learning.
+APPROVAL GATES: Stop at each approval checkpoint. Wait for confirmation before proceeding.
+MORE STEPS: Break every action into smallest possible steps. Execute more moves for better results.
+CONTINUOUS IMPROVEMENT: Learn from each action. Apply learnings to improve subsequent actions.
+
+EXECUTION REQUIREMENTS:
+- Execute step-by-step with maximum detail
+- Break every action into smallest possible steps
+- Verify each step before proceeding
+- Learn from each action and improve
+- Document all learnings for future improvements
+- Request approval at critical checkpoints
+- Retry failed steps with improved approach
+- Ensure FULL ACCESS to all accounts (not just creation)
+- Maintain consistent branding across platforms
+- Save all credentials securely
+- Document everything for future reference
+- Stop and review after each phase before proceeding
+
+=== SUCCESS CRITERIA (ENHANCED) ===
+✅ Google account created with FULL access and ALL features tested
+✅ TikTok account created with FULL access and ALL features tested
+✅ Twitter account created with FULL access and ALL features tested
+✅ All profiles optimized, consistent, and professionally appealing
+✅ AI avatar foundation completely established with all assets
+✅ All credentials saved securely in multiple locations
+✅ Complete documentation created (research, plans, reports, learnings)
+✅ All approval checkpoints passed
+✅ Learning and improvement mechanisms documented
+✅ Final approval received
+✅ Agent has learned and improved throughout execution
+✅ All steps executed with maximum detail and verification
+
+=== EXECUTION MODE ===
+Execute with maximum detail. Break every action into smallest steps. Verify each step. Learn and improve continuously. Request approval at checkpoints. Document everything. Execute more moves. Get better results.
