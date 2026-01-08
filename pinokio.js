@@ -10,7 +10,8 @@ module.exports = {
       install: info.running("install.js"),
       start: info.running("start.js"),
       update: info.running("update.js"),
-      reset: info.running("reset.js")
+      reset: info.running("reset.js"),
+      restart: info.running("restart.js")
     }
     if (running.install) {
       return [{
@@ -32,6 +33,10 @@ module.exports = {
             icon: 'fa-solid fa-terminal',
             text: "Terminal",
             href: "start.js",
+          }, {
+            icon: 'fa-solid fa-rotate',
+            text: "Restart",
+            href: "restart.js",
           }]
         } else {
           return [{
@@ -55,12 +60,23 @@ module.exports = {
           text: "Resetting",
           href: "reset.js",
         }]
+      } else if (running.restart) {
+        return [{
+          default: true,
+          icon: 'fa-solid fa-terminal',
+          text: "Restarting",
+          href: "restart.js",
+        }]
       } else {
         return [{
           default: true,
           icon: "fa-solid fa-power-off",
           text: "Start",
           href: "start.js",
+        }, {
+          icon: "fa-solid fa-rotate",
+          text: "Restart",
+          href: "restart.js",
         }, {
           icon: "fa-solid fa-plug",
           text: "Update",

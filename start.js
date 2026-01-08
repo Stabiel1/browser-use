@@ -11,7 +11,7 @@ module.exports = {
         },
         path: "app",                // Edit this to customize the path to start the shell from
         message: [
-          "python webui.py --ip 127.0.0.1 --port {{port}}"
+          "python webui.py --ip 0.0.0.0 --port {{port}}"
         ],
         on: [{
           // The regular expression pattern to monitor.
@@ -19,7 +19,9 @@ module.exports = {
           // and the script will go onto the next step.
           // The regular expression match object will be passed on to the next step as `input.event`
           // Useful for capturing the URL at which the server is running (in case the server prints some message about where the server is running)
-          "event": "/(http:\\/\\/\\S+)/", 
+          // This pattern captures http:// URLs including IP addresses, ports, and query parameters
+          // Matches: http://127.0.0.1:42000, http://192.168.178.21:42000, http://localhost:42000/?session=...
+          "event": "/(http:\\/\\/[^\\s\\n\\r]+)/", 
 
           // Use "done": true to move to the next step while keeping the shell alive.
           // Use "kill": true to move to the next step after killing the shell.
@@ -33,7 +35,7 @@ module.exports = {
       method: "local.set",
       params: {
         // the input.event is the regular expression match object from the previous step
-        // In this example, since the pattern was "/(http:\\/\\/\\S+)/", input.event[1] will include the exact http url match captured by the parenthesis (supports both IP addresses and hostnames).
+        // In this example, since the pattern was "/(http:\\/\\/[^\\s\\n\\r]+)/", input.event[1] will include the exact http url match captured by the parenthesis (supports both IP addresses, hostnames, and query parameters).
         // Therefore setting the local variable 'url'
         url: "{{input.event[1]}}"
       }
