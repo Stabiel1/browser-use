@@ -106,6 +106,17 @@ module.exports = {
         dest: "app/.env",
         when: "{{!exists('app/.env')}}"
       }
+    },
+    {
+      // Keep Gradio Web UI alive when not attached to a TTY (e.g. background / Pinokio)
+      method: "shell.run",
+      params: {
+        path: "app",
+        message: [
+          "patch -p1 -N -i ../patches/webui-block-thread.patch"
+        ],
+        when: "{{exists('patches/webui-block-thread.patch')}}"
+      }
     }
   ]
 }

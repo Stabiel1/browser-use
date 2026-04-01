@@ -14,6 +14,16 @@ module.exports = {
     {
       method: "shell.run",
       params: {
+        path: "app",
+        message: [
+          "patch -p1 -N -i ../patches/webui-block-thread.patch"
+        ],
+        when: "{{exists('patches/webui-block-thread.patch')}}"
+      }
+    },
+    {
+      method: "shell.run",
+      params: {
         venv: "{{envs.BROWSER_USE_VENV_PATH || (platform === 'win32' ? 'F:/browser-use-env' : 'env')}}",  // Use BROWSER_USE_VENV_PATH env var if set, F drive on Windows, else relative path 'env'
         env: {
           // Use F: drive for Playwright browsers on Windows to save space

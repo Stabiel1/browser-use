@@ -1,0 +1,22 @@
+From: browser-use Web UI — keep process alive after Gradio launch
+Apply from repo root: (cd app && patch -p1 < ../patches/webui-block-thread.patch)
+
+--- a/webui.py
++++ b/webui.py
+@@ -12,7 +12,15 @@ def main():
+     args = parser.parse_args()
+ 
+     demo = create_ui(theme_name=args.theme)
+-    demo.queue().launch(server_name=args.ip, server_port=args.port)
++    demo.queue()
++    # Keep the main process alive (needed when stdout is not a TTY or parent detaches).
++    demo.launch(
++        server_name=args.ip,
++        server_port=args.port,
++        prevent_thread_lock=True,
++        show_error=True,
++    )
++    demo.block_thread()
+ 
+ 
+ if __name__ == '__main__':
