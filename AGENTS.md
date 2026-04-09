@@ -76,3 +76,41 @@ Pushes to `main` trigger a multi-arch **Docker image** build (see `app/.github/w
 - **`AGENT_TRAINING_GUIDE.md`**: Training and task-execution notes for long-running agent workflows (not application runtime docs).
 
 When in doubt, search under `app/src/` for the feature (e.g. `BrowserUseAgent`, `DeepResearchAgent`, Gradio tabs) before adding new modules.
+
+## Cursor Cloud specific instructions
+
+### app/ directory bootstrapping
+
+The `app/` directory is **not checked in** to this repo. It is populated at setup time by cloning the upstream [browser-use/web-ui](https://github.com/browser-use/web-ui) repository (see `install.js`). The update script handles this automatically. Do not assume `app/` contents exist at commit time — they are runtime-only.
+
+### Python version
+
+The Dockerfile targets Python 3.11, but the Cloud VM ships Python 3.12. This works fine with one caveat: `setuptools` must be explicitly installed because Python 3.12 removed `distutils` (used by `browser_settings_tab.py`). The update script already covers this.
+
+### Playwright / browser
+
+Playwright CDN downloads are blocked by network egress restrictions in Cloud VMs. However, Google Chrome is pre-installed at `/usr/local/bin/google-chrome`. The app's `channel='chromium'` launch mode in `src/browser/custom_browser.py` will auto-detect system Chrome, so no extra config is needed. Set `BROWSER_PATH` in `app/.env` only if you need to override the default.
+
+### Running the Web UI
+
+```bash
+source /workspace/app/env/bin/activate
+cd /workspace/app
+python3 webui.py --ip 0.0.0.0 --port 7788
+```
+
+The UI will be available at `http://localhost:7788`.
+
+### Lint and tests
+
+```bash
+cd /workspace/app && source env/bin/activate
+ruff check .                     # lint
+python3 -m pytest tests/ -q      # tests (require live LLM keys + browser)
+```
+
+All 18 tests require live LLM API keys and/or running services (Ollama, MCP servers). They will fail without credentials — this is expected, not a regression.
+
+### Environment variables
+
+Copy `app/.env.example` → `app/.env` and set at least one LLM provider API key (e.g. `OPENAI_API_KEY`, `GOOGLE_API_KEY`) to enable agent functionality. Without any key, the UI loads but agent runs will error.
