@@ -1,6 +1,6 @@
 # GoddessErinSwarm
 
-Private local stack that combines **Open WebUI** (CUDA) + **Ollama**, **OpenClaw** (gateway and computer-control plane), optional **Tabby**, and a small **TTS HTTP service** built on **VoxCPM2** from OpenBMB (this repo names that service **FoxCPM2** for the Goddess Erin swarm).
+Private local stack that combines **Open WebUI** (CUDA) + **Ollama**, **OpenClaw** (gateway and computer-control plane), optional **Tabby**, and a small **VoxCPM2** TTS HTTP service from OpenBMB. **FoxCPM2 = VoxCPM2** is only an informal alias—this repo uses the **VoxCPM2** name everywhere.
 
 ## Repository privacy (GitHub)
 
@@ -23,9 +23,9 @@ Never commit `.env`, API keys, downloaded model weights, voice clones, or chat l
 
 | Path | Role |
 |------|------|
-| `docker-compose.yml` | GPU stack: Ollama, Open WebUI (CUDA), OpenClaw, FoxCPM2 TTS; optional Tabby via profile |
+| `docker-compose.yml` | GPU stack: Ollama, Open WebUI (CUDA), OpenClaw, **VoxCPM2** TTS; optional Tabby via profile |
 | `docker-compose.cpu.yml` | CPU-only Ollama + Open WebUI + OpenClaw (no TTS image) |
-| `now-docker/FoxCPM2/` | Dockerfile + FastAPI server for `/v1/tts` |
+| `now-docker/VoxCPM2/` | Dockerfile + FastAPI server for `/v1/tts` |
 | `now-open-web-live/` | Notes for Open WebUI |
 | `now-tabby/` | Optional Tabby profile |
 | `now-openclaw/` | OpenClaw volume and port notes |
@@ -33,7 +33,7 @@ Never commit `.env`, API keys, downloaded model weights, voice clones, or chat l
 
 ## Quick start (NVIDIA)
 
-Prerequisites: [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html).
+Prerequisites: [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) and a driver compatible with **CUDA 12.6** runtime images (the TTS image uses `pytorch/pytorch:2.11.0-cuda12.6-cudnn9-runtime`).
 
 ```bash
 cp .env.example .env
@@ -56,7 +56,7 @@ docker compose --profile tabby up -d
 
 (Tabby defaults to http://localhost:8088.)
 
-## FoxCPM2 / VoxCPM2 voice — step-by-step
+## VoxCPM2 voice — step-by-step
 
 **Goal:** any agent or script can turn model output into speech via one HTTP call, using **voice design** (text-only description) so you do not need reference audio.
 
@@ -65,7 +65,7 @@ docker compose --profile tabby up -d
    Example shape (keep your own wording local): *adult female, warm, confident, steady pace* — store only in `.env`, not in git.
 
 2. **Start the TTS container**  
-   With `docker compose up`, the `foxcpm2-tts` service builds from `now-docker/FoxCPM2` and downloads **`VOXCPM_MODEL_ID`** (default `openbmb/VoxCPM2`) into the `huggingface_cache` volume on first run. Expect several GB and a few minutes.
+   With `docker compose up`, the **`voxcpm2-tts`** service builds from `now-docker/VoxCPM2` and downloads **`VOXCPM_MODEL_ID`** (default `openbmb/VoxCPM2`) into the `huggingface_cache` volume on first run. Expect several GB and a few minutes.
 
 3. **Test synthesis**
 
@@ -85,7 +85,7 @@ docker compose --profile tabby up -d
    ```
 
 4. **Call from agents**  
-   After a turn completes, POST the **assistant reply text** to `http://foxcpm2-tts:8890/v1/tts` (same Docker network) or `http://localhost:8890` from the host. Play the WAV with your preferred player or pipe to your voice channel.  
+   After a turn completes, POST the **assistant reply text** to `http://voxcpm2-tts:8890/v1/tts` (same Docker network) or `http://localhost:8890` from the host. Play the WAV with your preferred player or pipe to your voice channel.  
    Override the voice for one-off lines with JSON field `voice_description` (still description-only; no audio upload required).
 
 5. **Open WebUI**  

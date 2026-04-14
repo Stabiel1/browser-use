@@ -1,5 +1,6 @@
-# VoxCPM2 (TTS) — CUDA 12.4, Python 3.11. Weights download at runtime into mounted HF cache volume.
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+# VoxCPM2 (TTS) — CUDA 12.6 runtime; weights download at runtime into mounted HF cache volume.
+# Requires host NVIDIA driver new enough for CUDA 12.6 containers (see NVIDIA Container Toolkit docs).
+FROM pytorch/pytorch:2.11.0-cuda12.6-cudnn9-runtime
 
 WORKDIR /app
 

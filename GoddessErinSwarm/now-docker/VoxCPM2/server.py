@@ -1,4 +1,4 @@
-"""HTTP API for VoxCPM2 TTS (project codename FoxCPM2 / Goddess Aura voice pipe)."""
+"""HTTP API for VoxCPM2 TTS (informal alias: FoxCPM2 = VoxCPM2)."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="GoddessErin TTS", version="1.0.0")
+app = FastAPI(title="GoddessErin VoxCPM2 TTS", version="1.0.0")
 
 _model = None
 _model_lock = threading.Lock()
@@ -54,7 +54,7 @@ class TtsRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model_loaded": _model is not None}
+    return {"status": "ok", "model": "VoxCPM2", "model_loaded": _model is not None}
 
 
 @app.post("/v1/tts")

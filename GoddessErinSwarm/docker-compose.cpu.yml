@@ -1,5 +1,5 @@
 # Optional fallback for hosts without NVIDIA GPUs: CPU-only Open WebUI + Ollama (no CUDA).
-# OpenClaw and Tabby stay usable; TTS (foxcpm2-tts) is omitted here — run TTS on a GPU box or locally.
+# OpenClaw and Tabby stay usable; TTS (voxcpm2-tts) is omitted here — run TTS on a GPU box or locally.
 #
 #   docker compose -f docker-compose.cpu.yml up -d
 

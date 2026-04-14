@@ -65,11 +65,11 @@ services:
     command: >-
       sh -c "node openclaw.mjs gateway --allow-unconfigured --bind 0.0.0.0 --port 18789"
 
-  foxcpm2-tts:
+  voxcpm2-tts:
     build:
-      context: ./now-docker/FoxCPM2
+      context: ./now-docker/VoxCPM2
       dockerfile: Dockerfile
-    container_name: ges-foxcpm2-tts
+    container_name: ges-voxcpm2-tts
     restart: unless-stopped
     ports:
       - "8890:8890"
