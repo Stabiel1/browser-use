@@ -1,0 +1,117 @@
+# GoddessErinSwarm — local stack: Open WebUI (CUDA) + Ollama + OpenClaw + VoxCPM2 TTS (+ optional Tabby).
+# Requires: Docker Compose v2, NVIDIA Container Toolkit, a CUDA-capable driver on the host.
+#
+# Usage:
+#   cp .env.example .env   # edit secrets
+#   docker compose up -d --build
+#
+# URLs (defaults):
+#   Open WebUI: http://localhost:3000
+#   Ollama API: http://localhost:11434
+#   OpenClaw:   http://localhost:18789  (set OPENCLAW_GATEWAY_TOKEN in .env)
+#   TTS API:    http://localhost:8890/docs
+
+name: goddess-erin-swarm
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ges-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:cuda
+    container_name: ges-open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+    volumes:
+      - open_webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:2026.4.12-slim
+    container_name: ges-openclaw
+    restart: unless-stopped
+    user: "1000:1000"
+    ports:
+      - "18789:18789"
+    environment:
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?Set OPENCLAW_GATEWAY_TOKEN in .env}
+    volumes:
+      - openclaw_config:/home/node/.openclaw
+      - openclaw_workspace:/home/node/workspace
+    command: >-
+      sh -c "node openclaw.mjs gateway --allow-unconfigured --bind 0.0.0.0 --port 18789"
+
+  voxcpm2-tts:
+    build:
+      context: ./now-docker/VoxCPM2
+      dockerfile: Dockerfile
+    container_name: ges-voxcpm2-tts
+    restart: unless-stopped
+    ports:
+      - "8890:8890"
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN:-}
+      GODDESS_AURA_VOICE: ${GODDESS_AURA_VOICE:-}
+      VOXCPM_MODEL_ID: ${VOXCPM_MODEL_ID:-openbmb/VoxCPM2}
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  tabby:
+    profiles: [tabby]
+    image: registry.tabbyml.com/tabbyml/tabby
+    container_name: ges-tabby
+    restart: unless-stopped
+    command: >-
+      serve --model ${TABBY_MODEL:-StarCoder2-3B}
+      --chat-model ${TABBY_CHAT_MODEL:-Qwen2.5-Coder-1.5B-Instruct}
+      --device cuda
+    ports:
+      - "8088:8080"
+    volumes:
+      - tabby_data:/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  ollama_data:
+  open_webui_data:
+  openclaw_config:
+  openclaw_workspace:
+  huggingface_cache:
+  tabby_data:

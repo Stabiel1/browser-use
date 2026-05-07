@@ -1,0 +1,50 @@
+# Optional fallback for hosts without NVIDIA GPUs: CPU-only Open WebUI + Ollama (no CUDA).
+# OpenClaw and Tabby stay usable; TTS (voxcpm2-tts) is omitted here — run TTS on a GPU box or locally.
+#
+#   docker compose -f docker-compose.cpu.yml up -d
+
+name: goddess-erin-swarm-cpu
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ges-ollama-cpu
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data_cpu:/root/.ollama
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ges-open-webui-cpu
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+    volumes:
+      - open_webui_data_cpu:/app/backend/data
+    depends_on:
+      - ollama
+
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:2026.4.12-slim
+    container_name: ges-openclaw-cpu
+    restart: unless-stopped
+    user: "1000:1000"
+    ports:
+      - "18789:18789"
+    environment:
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?Set OPENCLAW_GATEWAY_TOKEN in .env}
+    volumes:
+      - openclaw_config_cpu:/home/node/.openclaw
+      - openclaw_workspace_cpu:/home/node/workspace
+    command: >-
+      sh -c "node openclaw.mjs gateway --allow-unconfigured --bind 0.0.0.0 --port 18789"
+
+volumes:
+  ollama_data_cpu:
+  open_webui_data_cpu:
+  openclaw_config_cpu:
+  openclaw_workspace_cpu:
